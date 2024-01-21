@@ -2,6 +2,7 @@ package compalier_project;
 
 import java.util.ArrayList;
 
+
 public class RecursiveDecentParser {
 
 	private int index;
@@ -16,22 +17,12 @@ public class RecursiveDecentParser {
 		this.currentToken = tokens.get(0);
 	}
 
-	/**
-	 * This is the method if called then the file is parsed
-	 * 
-	 * @throws SyntaxErorr
-	 */
+	// This is the method if called then the file is parsed
 	public void parse() throws SyntaxErorr {
-		try {
-			module_decl();
-		} catch (SyntaxErorr e) {
-			ERORR("Expected token not found at " + currentToken);
-		}
+		module_dec();
 	}
 
-	/**
-	 * this methid set the index to the next token index
-	 */
+	// this mehtod to fet next token
 	private boolean nextToken() {
 		index++;
 		if (index < tokens.size()) {
@@ -43,38 +34,12 @@ public class RecursiveDecentParser {
 		}
 	}
 
-	/*
-	 * I created this method to hanldle error modes panicly were i put the next
-	 * token as null
-	 */
-	/**
-	 * @param string
-	 * @throws SyntaxErorr
-	 */
-	private void ERORR(String string) throws SyntaxErorr {
-		answer = false;
-		SyntaxErorr e = new SyntaxErorr(currentToken);
-		e.setMessage(string);
-		setError(e.getMessage());
-		System.out.println(e.getMessage());
-		/*
-		 * The panic mode
-		 */
-		currentToken = null;
-	}
-
-	/*
-	 * I ceated this method to handle the invalid user defined naming
-	 */
-	/**
-	 * @return
-	 * @throws SyntaxErorr
-	 */
-	private boolean invalidName() throws SyntaxErorr {
+	// this method to to handle the invalid user defined naming
+	private boolean invalidName() throws Error {
 		if (Tokenizer.reservedWords.contains(currentToken)) {
 			answer = false;
 			@SuppressWarnings("unused")
-			SyntaxErorr e = new SyntaxErorr(currentToken);
+			Error e = new Error(currentToken);
 			String message = "Invalid naming at " + currentToken + " used reserved word";
 			setError(message);
 			currentToken = null;
@@ -85,13 +50,8 @@ public class RecursiveDecentParser {
 		}
 	}
 
-	/*
-	 * I created this method to handle when the value integer is invalid
-	 */
-	/**
-	 * @throws SyntaxErorr
-	 */
-	private void invalidINT() throws SyntaxErorr {
+	// this method to handle the integer value
+	private void invalidINT() throws Error {
 		try {
 			@SuppressWarnings("unused")
 			int value = Integer.parseInt(currentToken);
@@ -99,20 +59,14 @@ public class RecursiveDecentParser {
 		} catch (Exception e1) {
 			answer = false;
 			@SuppressWarnings("unused")
-			SyntaxErorr e = new SyntaxErorr(currentToken);
+			Error e = new Error(currentToken);
 			String message = "Invalid integer value at " + currentToken;
 			setError(message);
 			currentToken = null;
 		}
 	}
 
-	/*
-	 * This method returns the answer in string to be displayed to usr this is the
-	 * final answer of the parsing process
-	 */
-	/**
-	 * @return answer if passed or failure
-	 */
+	// return the result
 	public String returnResult() {
 		if (answer == true) {
 			return "parsed";
@@ -121,18 +75,7 @@ public class RecursiveDecentParser {
 		}
 	}
 
-	/*
-	 * This method is created for the reason that in each production rule instead of
-	 * writing the same logic of matching an expected token I use this method to
-	 * match if it doesn't match what is expected like a semi colon for example it
-	 * will call the ERROR method which will return the error
-	 */
-	/**
-	 * @param expectedToken
-	 * @return
-	 * @throws SyntaxErorr
-	 */
-	private boolean match(String expectedToken) throws SyntaxErorr {
+	private boolean match(String expectedToken) throws Error {
 		if (currentToken == null) {
 			return false;
 		}
@@ -146,7 +89,7 @@ public class RecursiveDecentParser {
 		return true;
 	}
 
-	private void module_decl() throws SyntaxErorr {
+	private void module_dec() throws Error {
 		module_heading();
 		declarations();
 		procedure_decl();
@@ -155,24 +98,24 @@ public class RecursiveDecentParser {
 		match(".");
 	}
 
-	private void module_heading() throws SyntaxErorr {
+	private void module_heading() throws Error {
 		match("module");
 		name();
 		match(";");
 	}
 
-	private void block() throws SyntaxErorr {
+	private void block() throws Error {
 		match("begin");
 		stmt_list();
 		match("end");
 	}
 
-	private void declarations() throws SyntaxErorr {
+	private void declarations() throws Error {
 		const_decl();
 		var_decl();
 	}
 
-	private void const_decl() throws SyntaxErorr {
+	private void const_decl() throws Error {
 		if (match("const")) {
 			const_list();
 		} else {
@@ -182,28 +125,31 @@ public class RecursiveDecentParser {
 	}
 
 //	return to do this in other time
-	private void const_list() throws SyntaxErorr {
+	private void const_list() throws Error {
 		while (name()) {
+			match(";");
+			value();
 			match(";");
 		}
 	}
 
-	private void var_decl() throws SyntaxErorr {
+	private void var_decl() throws Error {
 		if (match("var")) {
 			var_list();
 		} else {
 //			lamad case
+			nextToken();
 		}
 
 	}
 
-	private void var_list() throws SyntaxErorr {
+	private void var_list() throws Error {
 		while (var_item()) {
 			match(";");
 		}
 	}
 
-	private boolean var_item() throws SyntaxErorr {
+	private boolean var_item() throws Error {
 		name_list();
 		match(":");
 		data_type();
@@ -211,14 +157,14 @@ public class RecursiveDecentParser {
 
 	}
 
-	private void name_list() throws SyntaxErorr {
+	private void name_list() throws Error {
 		name();
 		while (match(",")) {
 			name();
 		}
 	}
 
-	private void data_type() throws SyntaxErorr {
+	private void data_type() throws Error {
 		if (match("integer ")) {
 			nextToken();
 		} else if (match("real")) {
@@ -228,7 +174,7 @@ public class RecursiveDecentParser {
 		}
 	}
 
-	private void procedure_decl() throws SyntaxErorr {
+	private void procedure_decl() throws Error {
 		procedure_heading();
 		declarations();
 		block();
@@ -236,20 +182,20 @@ public class RecursiveDecentParser {
 		match(";");
 	}
 
-	private void procedure_heading() throws SyntaxErorr {
+	private void procedure_heading() throws Error {
 		match("procedure");
 		name();
 		match(";");
 	}
 
-	private void stmt_list() throws SyntaxErorr {
+	private void stmt_list() throws Error {
 		statement();
 		while (match(";")) {
 			statement();
 		}
 	}
 
-	private void statement() throws SyntaxErorr {
+	private void statement() throws Error {
 		if (ass_stmt()) {
 			nextToken();
 		} else if (read_stmt()) {
@@ -272,28 +218,28 @@ public class RecursiveDecentParser {
 		}
 	}
 
-	private boolean ass_stmt() throws SyntaxErorr {
+	private boolean ass_stmt() throws Error {
 		name();
 		match(":=");
 		exp();
 		return true;
 	}
 
-	private void exp() throws SyntaxErorr {
+	private void exp() throws Error {
 		term();
 		while (add_oper()) {
 			term();
 		}
 	}
 
-	private void term() throws SyntaxErorr {
+	private void term() throws Error {
 		factor();
 		while (mul_oper()) {
 			factor();
 		}
 	}
 
-	private void factor() throws SyntaxErorr {
+	private void factor() throws Error {
 		if (match("(")) {
 			exp();
 			match(")");
@@ -305,7 +251,7 @@ public class RecursiveDecentParser {
 
 	}
 
-	private boolean add_oper() throws SyntaxErorr {
+	private boolean add_oper() throws Error {
 		if (currentToken.equals("+")) {
 			match("+");
 		} else if (currentToken.equals("-")) {
@@ -314,7 +260,7 @@ public class RecursiveDecentParser {
 		return true;
 	}
 
-	private boolean mul_oper() throws SyntaxErorr {
+	private boolean mul_oper() throws Error {
 		if (currentToken.equals("*")) {
 			match("*");
 		} else if (currentToken.equals("/")) {
@@ -327,7 +273,7 @@ public class RecursiveDecentParser {
 		return true;
 	}
 
-	private boolean read_stmt() throws SyntaxErorr {
+	private boolean read_stmt() throws Error {
 		match("readint");
 		if (match("(")) {
 			name_list();
@@ -348,7 +294,7 @@ public class RecursiveDecentParser {
 		return true;
 	}
 
-	private boolean write_stmt() throws SyntaxErorr {
+	private boolean write_stmt() throws Error {
 		match("writeint");
 		if (match("(")) {
 			write_list();
@@ -369,22 +315,22 @@ public class RecursiveDecentParser {
 		return true;
 	}
 
-	private void write_list() throws SyntaxErorr {
+	private void write_list() throws Error {
 		write_item();
 		while (match(",")) {
 			write_item();
 		}
 	}
 
-	private void write_item() throws SyntaxErorr {
+	private void write_item() throws Error {
 		if (name()) {
 
-		} else if (value()) {
-
+		} else {
+			value();
 		}
 	}
 
-	private boolean if_stmt() throws SyntaxErorr {
+	private boolean if_stmt() throws Error {
 		if (match("if")) {
 			condition();
 		} else if (match("then")) {
@@ -397,11 +343,11 @@ public class RecursiveDecentParser {
 		return true;
 	}
 
-	private void elseif_part() throws SyntaxErorr {
+	private void elseif_part() throws Error {
 
 	}
 
-	private void else_part() throws SyntaxErorr {
+	private void else_part() throws Error {
 		if (match("else")) {
 			stmt_list();
 		} else {
@@ -409,7 +355,7 @@ public class RecursiveDecentParser {
 		}
 	}
 
-	private boolean while_stmt() throws SyntaxErorr {
+	private boolean while_stmt() throws Error {
 		match("while");
 		condition();
 		match("do");
@@ -418,7 +364,7 @@ public class RecursiveDecentParser {
 		return true;
 	}
 
-	private boolean repeat_stmt() throws SyntaxErorr {
+	private boolean repeat_stmt() throws Error {
 		match("loop");
 		stmt_list();
 		match("until");
@@ -426,24 +372,24 @@ public class RecursiveDecentParser {
 		return true;
 	}
 
-	private boolean exit_stmt() throws SyntaxErorr {
+	private boolean exit_stmt() throws Error {
 		match("exit");
 		return true;
 	}
 
-	private boolean call_stmt() throws SyntaxErorr {
+	private boolean call_stmt() throws Error {
 		match("call");
 		name();
 		return true;
 	}
 
-	private void condition() throws SyntaxErorr {
+	private void condition() throws Error {
 		name_value();
 		relational_oper();
 		name_value();
 	}
 
-	private void name_value() throws SyntaxErorr {
+	private void name_value() throws Error {
 		if (nextToken()) {
 			name();
 		} else {
@@ -451,7 +397,7 @@ public class RecursiveDecentParser {
 		}
 	}
 
-	private void relational_oper() throws SyntaxErorr {
+	private void relational_oper() throws Error {
 		if (currentToken.equals("=")) {
 			match("=");
 		} else if (currentToken.equals("|=")) {
@@ -467,13 +413,14 @@ public class RecursiveDecentParser {
 		}
 	}
 
-	private boolean name() throws SyntaxErorr {
-//		letter();
+	private boolean name() throws Error {
+		// letter();
+
 		return true;
 
 	}
 
-	private boolean value() throws SyntaxErorr {
+	private boolean value() throws Error {
 		if (match("integer")) {
 			integer_value();
 			return true;
@@ -484,12 +431,26 @@ public class RecursiveDecentParser {
 
 	}
 
-	private void integer_value() throws SyntaxErorr {
-
+	private void integer_value() throws Error {
+		int value = Integer.parseInt(currentToken);
+		nextToken();
 	}
 
-	private void real_value() throws SyntaxErorr {
+	private void real_value() throws Error {
+		 double value = Double.parseDouble(currentToken);
+		 nextToken();
+}
 
+	private void ERORR(String string) throws SyntaxErorr {
+		answer = false;
+		SyntaxErorr e = new SyntaxErorr(currentToken);
+		e.setMessage(string);
+		setError(e.getMessage());
+		System.out.println(e.getMessage());
+		/*
+		 * The panic mode
+		 */
+		currentToken = null;
 	}
 
 	public void setError(String error) {
